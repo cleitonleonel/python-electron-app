@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hello Python from Electron!</title>
+  <style>
+    p {
+      color: red;
+      margin: 5px;
+      cursor: pointer;
+    }
+    p:hover {
+      background: yellow;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hello Python!</h1>
+  <div>
+    <button type="button" onclick="runPython()" >Push me</button>
+    <button type="button" onclick="execPython()">Play mp3</button>
+    <button type="button" onclick="openLink()">Open Link</button>
+  </div>
+  <br>
+  <div>
+    <form class="form-control" id="myForm">
+      <br/>
+      <!--<input type="text" id="opt_other" name="opt_other" required><br>-->
+      DIGITE O TEXTO : <input name="Text" value=""><br>
+      <br/>
+      <!--<input type="submit">-->
+      <button type="button" onclick="TextToSpeech()">Text to Speech</button>
+      <br/>
+    </form>
+  </div>
+  <br>
+  <p>First Paragraph</p>
+  <p>Second Paragraph</p>
+  <p>Yet one more Paragraph</p>
+</body>
+<script>
+  function openLink() {
+    const { shell } = require('electron');
+    shell.openExternal('https://github.com');
+  }
+</script>
+<script>
+  function runPython() {
+      alert('oiiiiiiiiiiiiiiiii');
+  }
+</script>
+<script>
+  function execPython() {
+    const remote = require('electron').remote;
+    const app = remote.app;
+    var pyshell =  require('python-shell');
+    let options = {
+      mode: 'text',
+      pythonPath: '/usr/bin/python3.6',
+      pythonOptions: ['-u'],
+      scriptPath: '.',
+      args: []
+    };
+    pyshell.run('play_music.py', options,  function  (err, results)  {
+    if (err)  throw err;
+      app.console.log('result: ', results.toString('utf8'));
+    });
+  }
+</script>
+<script>
+  const $ = require('jquery');
+  $("p").click(function() {
+    $(this).slideUp();
+  });
+</script>
+<script>
+  function TextToSpeech () {
+    var form = document.getElementById("myForm")[0].value;
+    var text = JSON.stringify(form);
+    //alert('TEXT: ' + text);
+    const remote = require('electron').remote;
+    const app = remote.app;
+    var pyshell =  require('python-shell');
+    let options = {
+      mode: 'text',
+      pythonPath: '/usr/bin/python3.6',
+      pythonOptions: ['-u'],
+      scriptPath: '.',
+      args: [text]
+    };
+    pyshell.run('text2speech.py', options,  function  (err, results)  {
+    if (err)  throw err;
+      app.console.log('result: ', results.toString('utf8'));
+    });
+  }
+</script>
+</html>
+
