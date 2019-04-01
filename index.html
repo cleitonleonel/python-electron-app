@@ -3,33 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <title>Hello Python from Electron!</title>
-  <style>
-    p {
-      color: red;
-      margin: 5px;
-      cursor: pointer;
-    }
-    p:hover {
-      background: yellow;
-    }
-  </style>
+  <link href="style.css" type="text/css" rel="stylesheet">
+  <script src="https://code.responsivevoice.org/responsivevoice.js?key=0wGFUqdm"></script>
+  <!--<link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">-->
 </head>
 <body>
-  <h1>Hello Python!</h1>
-  <div>
-    <button type="button" onclick="runPython()" >Push me</button>
-    <button type="button" onclick="execPython()">Play mp3</button>
-    <button type="button" onclick="openLink()">Open Link</button>
+  <div class="container" align="center">
+    <h1>Hello Python!</h1>
   </div>
+  <div>
+    <button class="clickable" type="button" onclick="runPython()" >Push me</button>
+    <button class="clickable" type="button" onclick="execPython()">Play mp3</button>
+    <button class="clickable" type="button" onclick="openLink()">Open Link</button>
+    <button class="clickable" type="button" onclick="respVoice('Oi,tudo bom ?')">Voice</button>
+    <button class="clickable" type="button" onclick="autoPlay('Oi,tudo bom ?','pt-br')">AutoPlay</button>
+    <button class="clickable" type="button" id="test" onclick="Speak('Oi,tudo bom?')">Speak</button>
+  </div>
+  <div><select id="voiceSelect"></select></div>
   <br>
   <div>
     <form class="form-control" id="myForm">
       <br/>
-      <!--<input type="text" id="opt_other" name="opt_other" required><br>-->
-      DIGITE O TEXTO : <input name="Text" value=""><br>
-      <br/>
-      <!--<input type="submit">-->
-      <button type="button" onclick="TextToSpeech()">Text to Speech</button>
+      DIGITE O TEXTO : <input name="Text" value="" style="margin: 0 auto; width: 500px; font-size: 20px; padding: 10px 10px;">
+      <button class="clickable" type="button" onclick="TextToSpeech()">Text to Speech</button>
       <br/>
     </form>
   </div>
@@ -93,6 +89,93 @@
       app.console.log('result: ', results.toString('utf8'));
     });
   }
+</script>
+<script>
+  function Speak (text) {
+    const jq = require('jquery');
+    var timer = setInterval(function(){
+      //const awaitVoices = new Promise(resolve=>
+      //window.speechSynthesis.onvoiceschanged = resolve)
+    //.then(()=> {
+      //const synth = window.speechSynthesis;
+
+      //var voices = synth.getVoices();
+      //console.log(voices)
+      var voices = speechSynthesis.getVoices();
+      console.log(voices);
+      if (voices.length !== 0) {
+        var msg = new SpeechSynthesisUtterance();
+        msg.voice = voices[106];
+        msg.text = text;
+        msg.onend = function(event) { console.log('Speech complete'); }
+        speechSynthesis.speak(msg);
+        clearInterval(timer);
+      }
+  }, 20);
+      //const utterance = new SpeechSynthesisUtterance();
+      //utterance.voice = voices[3];
+      //utterance.text = text;
+
+      //synth.speak(utterance);
+    //});
+  //}
+    //function Speak (text) {
+      //var utter = new SpeechSynthesisUtterance();
+      //utter.text = 'ola pessoal';
+      //utter.onend = function(event) { console.log('Speech complete'); }
+      //speechSynthesis.speak(utter);
+    //}
+    jq("#test").on('click', timer);
+  }
+</script>
+<script>
+function populateVoiceList() {
+  if(typeof speechSynthesis === 'undefined') {
+    return;
+  }
+
+  voices = speechSynthesis.getVoices();
+  console.log(voices);
+  for(i = 0; i < voices.length ; i++) {
+    var option = document.createElement('option');
+    option.textContent = voices[i].name + ' (' + voices[i].lang + ')';
+
+    if(voices[i].default) {
+      option.textContent += ' -- DEFAULT';
+    }
+
+    option.setAttribute('data-lang', voices[i].lang);
+    option.setAttribute('data-name', voices[i].name);
+    document.getElementById("voiceSelect").appendChild(option);
+  }
+}
+
+populateVoiceList();
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = populateVoiceList;
+}
+</script>
+<script>
+  function respVoice (text) {
+    if(responsiveVoice.voiceSupport()) {
+    console.log('Err');
+  }
+  var voices = responsiveVoice.getVoices();
+  console.log(voices);
+  responsiveVoice.setDefaultVoice("Portuguese Male");
+  responsiveVoice.speak(text);
+}
+</script>
+<script>
+  function autoPlay (text, lang) {
+    var source = "https://code.responsivevoice.org/getvoice.php?t=" + text + "&tl=" + lang;
+    var audio = new Audio();
+    audio.addEventListener("load", function() {
+      audio.play();
+    }, true);
+    audio.src = source;
+    audio.autoplay = true;
+}
 </script>
 </html>
 
